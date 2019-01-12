@@ -5,11 +5,26 @@ var Twison = {
       return links.map(function(link) {
         var differentName = link.match(/\[\[(.*?)\-\&gt;(.*?)\]\]/);
         if (differentName) {
+          var ret = {link : differentName[2]};
+          /*
+          è possibile impostare massimo una variabile nel nome del link con %%NomeVariabile%% 
+          eliminarne al massimo una %%!NomeVariabile%% nel nome della variabile l'unico simbolo vietato è ! 
+          e il dome variabile default (la variabile default è sempre vera)
+          */
+          var vari = differentName[1].match(/%%([^!]+)%%/);
+          var novari = differentName[1].match(/%%!([^!]+)%%/);
+          if (vari){
+            differentName[1] = differentName[1].replace(/%%([^!]+)%%/, "");
+            ret.set = vari[1];
+          }
+          if (novari) {
+            differentName[1] = differentName[1].replace(/%%!([^!]+)%%/, "");
+            ret.unset = novari[1];
+          } 
+          ret.name = differentName[1];
+
           // [[name->link]]
-          return {
-            name: differentName[1],
-            link: differentName[2]
-          };
+          return ret;
         } else {
           // [[link]]
           link = link.substring(2, link.length-2)
@@ -22,12 +37,20 @@ var Twison = {
     }
   },
 
-  convertPassage: function(passage) {
+    convertPassage: function(passage) {
   	var dict = {text: passage.innerHTML};
 
     var links = Twison.extractLinksFromText(dict.text);
     if (links) {
       dict.links = links;
+    }
+
+    //Rimuovo dai link quello che serve per la definizione delle variabili
+    dict.text = dict.text.replace(/%%.+%%/g,"");
+
+    //IDENTIFICO SE E' UN IF PASSAGE distinto con la sequenza %IFPASSAGE% nel testo
+    if (dict.text.match(/%IFPASSAGE%/g)){
+      dict.ifpassage = true;
     }
 
     ["name", "pid", "position", "tags"].forEach(function(attr) {
