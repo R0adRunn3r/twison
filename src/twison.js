@@ -53,20 +53,12 @@ var Twison = {
       dict.ifpassage = true;
     }
 
-    ["name", "pid", "position", "tags"].forEach(function(attr) {
+    ["name", "pid", "tags"].forEach(function(attr) {
       var value = passage.attributes[attr].value;
       if (value) {
         dict[attr] = value;
       }
     });
-
-    if(dict.position) {
-      var position = dict.position.split(',')
-      dict.position = {
-        x: position[0],
-        y: position[1]
-      }
-    }
 
     if (dict.tags) {
       dict.tags = dict.tags.split(" ");
@@ -77,13 +69,14 @@ var Twison = {
 
   convertStory: function(story) {
     var passages = story.getElementsByTagName("tw-passagedata");
-    var convertedPassages = Array.prototype.slice.call(passages).map(Twison.convertPassage);
+    var convertedPassages = {}
+    Array.prototype.slice.call(passages).map(function(ps) { convertedPassages[ps.attributes['pid'].value] = Twison.convertPassage(ps)});
 
     var dict = {
       passages: convertedPassages
     };
 
-    ["name", "startnode", "creator", "creator-version", "ifid"].forEach(function(attr) {
+    ["name", "startnode", "creator-version", "ifid"].forEach(function(attr) {
       var value = story.attributes[attr].value;
       if (value) {
         dict[attr] = value;
@@ -92,13 +85,13 @@ var Twison = {
 
     // Add PIDs to links
     var pidsByName = {};
-    dict.passages.forEach(function(passage) {
-      pidsByName[passage.name] = passage.pid;
+    Object.keys(dict.passages).forEach(function(key) {
+      pidsByName[dict.passages[key].name] = dict.passages[key].pid;
     });
 
-    dict.passages.forEach(function(passage) {
-      if (!passage.links) return;
-      passage.links.forEach(function(link) {
+    Object.keys(dict.passages).forEach(function(key) {
+      if (!dict.passages[key].links) return;
+      dict.passages[key].links.forEach(function(link) {
         link.pid = pidsByName[link.link];
         if (!link.pid) {
           link.broken = true;
