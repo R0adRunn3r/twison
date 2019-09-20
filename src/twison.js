@@ -9,7 +9,7 @@ var Twison = {
           /*
           è possibile impostare massimo una variabile nel nome del link con %%NomeVariabile%% 
           eliminarne al massimo una %%!NomeVariabile%% nel nome della variabile l'unico simbolo vietato è ! 
-          e il dome variabile default (la variabile default è sempre vera)
+          e il nome variabile default (la variabile default è sempre vera)
           */
           var vari = differentName[1].match(/%%([^!]+)%%/);
           var novari = differentName[1].match(/%%!([^!]+)%%/);
