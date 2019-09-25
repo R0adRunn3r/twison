@@ -13,6 +13,7 @@ var outputJSON = {
   author: package.author,
   description: package.description,
   proofing: false,
+  image: package.image,
   source: html
 };
 

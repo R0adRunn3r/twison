@@ -3,6 +3,7 @@
   "version": "0.0.3",
   "description": "Export your Twine 2 story as a JSON document with new variable style",
   "main": "format.js",
+  "image" : "logo.svg",
   "scripts": {
     "test": "cd test && mocha test.js"
   },

@@ -11,14 +11,14 @@ var Twison = {
           eliminarne al massimo una %%!NomeVariabile%% nel nome della variabile l'unico simbolo vietato è ! 
           e il nome variabile default (la variabile default è sempre vera)
           */
-          var vari = differentName[1].match(/%%([^!]+)%%/);
-          var novari = differentName[1].match(/%%!([^!]+)%%/);
+          var vari = differentName[1].match(/%%([^!]+?)%%/);
+          var novari = differentName[1].match(/%%!([^!]+?)%%/);
           if (vari){
-            differentName[1] = differentName[1].replace(/%%([^!]+)%%/, "");
+            differentName[1] = differentName[1].replace(/%%([^!]+?)%%/, "");
             ret.set = vari[1];
           }
           if (novari) {
-            differentName[1] = differentName[1].replace(/%%!([^!]+)%%/, "");
+            differentName[1] = differentName[1].replace(/%%!([^!]+?)%%/, "");
             ret.unset = novari[1];
           } 
           ret.name = differentName[1];
@@ -46,7 +46,7 @@ var Twison = {
     }
 
     //Rimuovo dai link quello che serve per la definizione delle variabili
-    dict.text = dict.text.replace(/%%.+%%/g,"");
+    dict.text = dict.text.replace(/%%.+?%%/g,"");
 
     //IDENTIFICO SE E' UN IF PASSAGE distinto con la sequenza %IFPASSAGE% nel testo
     if (dict.text.match(/%IFPASSAGE%/g)){
