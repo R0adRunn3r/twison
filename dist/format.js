@@ -1,5 +1,5 @@
 window.storyFormat({
-  "name": "twivan",
+  "name": "Twivan",
   "version": "0.0.3",
   "author": "RoadRunner",
   "description": "Export your Twine 2 story as a JSON document with new variable style",

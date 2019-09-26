@@ -1,17 +1,6 @@
-# Twison
+# Twivan
 
-[![Build Status](https://travis-ci.org/lazerwalker/twison.svg?branch=master)](https://travis-ci.org/lazerwalker/twison)
-
-Twison is a story format for [Twine 2](http://twinery.org/2) that simply exports to JSON.
-
-It is inspired by [Entweedle](http://www.maximumverbosity.net/twine/Entweedle/) as a model for how Twine 2 story formats work.
-
-## Installation
-
-From the Twine 2 story select screen, add a story format, and point it to the url `https://lazerwalker.com/twison/format.js`.
-
-From within your story, set the story format to Twison. Choosing "Play" will now give you a JSON file.
-
+Twivan is a story format for [Twine 2](http://twinery.org/2) that exports stories to JSON format to be used with alexa story engine. Forked and inspired from Twison story format
 
 ## Output
 
@@ -19,75 +8,107 @@ Here's an example of its output:
 
 ```json
 {
-  "passages": [
-    {
-      "text": "This is a passage that goes to [[No Where->nowhere]].\n\nor is to [[somewhere]]?\n\nHere's a [[third link]]\n\nClick [[me->someNode]]",
-      "links": [
-        {
-          "name": "No Where",
-          "link": "nowhere",
-          "pid": "3"
-        },
-        {
-          "name": "somewhere",
-          "link": "somewhere",
-          "pid": "2"
-        },
-        {
-          "name": "third link",
-          "link": "third link",
-          "pid": "4"
-        },
-        {
-          "name": "me",
-          "link": "someNode",
-          "pid": "5"
-        }
-      ],
-      "name": "First passage",
-      "pid": "1",
-      "position": {
-        "x": "553.3333333333334",
-        "y": "38.333333333333336"
+    "passages": {
+      "1": {
+        "text": "Inizio storia tutto in ordine. [[Avanti->prossimo1]] o [[Indietro->prossimo1]]",
+        "links": [
+          {
+            "link": "prossimo1",
+            "set": "var1",
+            "name": "Avanti",
+            "pid": "2"
+          },
+          {
+            "link": "prossimo1",
+            "name": "Indietro",
+            "pid": "2"
+          }
+        ],
+        "name": "Inizio",
+        "pid": "1"
       },
-      "tags": [
-        "tag",
-        "second-tag"
-      ]
-    },
-    {
-      "text": "You found me!",
-      "name": "somewhere",
-      "pid": "2",
-      "position": {
-        "x": "893.3333333333334",
-        "y": "241.66666666666669"
+      "2": {
+        "text": "Adesso c'è la variabile impostata. [[Prova if->condizione]] o [[vai avanti->fine1]]",
+        "links": [
+          {
+            "link": "condizione",
+            "name": "Prova if",
+            "pid": "3"
+          },
+          {
+            "link": "fine1",
+            "name": "vai avanti",
+            "pid": "4"
+          }
+        ],
+        "name": "prossimo1",
+        "pid": "2"
+      },
+      "3": {
+        "text": "%IFPASSAGE% [[var1->fineok]] [[default->fine no]]",
+        "links": [
+          {
+            "link": "fineok",
+            "unset": "var1",
+            "name": "var1",
+            "pid": "5"
+          },
+          {
+            "link": "fine no",
+            "name": "default",
+            "pid": "6"
+          }
+        ],
+        "ifpassage": true,
+        "name": "condizione",
+        "pid": "3"
+      },
+      "4": {
+        "text": "Fine nulla di fatto",
+        "name": "fine1",
+        "pid": "4"
+      },
+      "5": {
+        "text": "hai la variabile ma ti è stata tolta",
+        "name": "fineok",
+        "pid": "5"
+      },
+      "6": {
+        "text": "non ce l'hai",
+        "name": "fine no",
+        "pid": "6"
       }
-    }
-  ],
-  "name": "Test",
-  "startnode": "1",
-  "creator": "Twine",
-  "creator-version": "2.0.9",
-  "ifid": "1881C2BE-C764-4D33-ACC6-7BAEBB6D770A"
-}
+    },
+    "name": "Testiamo Engine",
+    "startnode": "1",
+    "creator-version": "2.2.1",
+  }
 ```
 
-It aims to maintain all fields provided in Twine's internal XML data, while augmenting with other information where possible. For example, it doesn't touch a node's text contents, but it does parse links to provide a dictionary of links and destination nodes.
 
+## Usage of variables and ifpassages
+If you need to set a variable (es: var1) on a link just use `%%var1%%` on the link text like `[[%%var1%% Go south->south]]`. If you want to unset a variable just use a esclamation mark in front of it like `[[%%!var1%% Go south->south]]`. Attention: never use the variable `default` as this is used ad a default path for the if passages. As variables name use only alfanumerical characters and `_ -`.
 
-## Interoperating with other systems
+If you want to create a if passages (a passages used to put a condition based on setted variables) just create a normal passage in twine and insert in the passage text `%IFPASSAGE%` and as many link as you need, every link is a check on a variable. For esample this if passage:
 
-The goal of Twison is to make it easy to use Twine as a frontend for forms of storytelling that differ from Twine's default hypertext output. While being able to copy/paste your JSON from Twison's output into some other system is doable, it's easy to imagine how a tighter integration with external systems could make it a lot easier to use Twine as a prototyping tool.
+```
+%IFPASSAGE% [[var1->passage_3]] [[var2->passage_5]] [[default->end_game]]
+```
 
-The hope is that this will eventually take the form of some sort of module system that will make it easy for you to create an integration between Twine/Twison and your own engine. 
+if `var1` is setted the game next passage will be `passage_3`, if none of the variables is set the default path is taken to the passage `end_game`. Pay attenction, if both var1 and var2 are setted you can not predict exactly whitch path will be followed so if something like this can happen just use more consecutives if passages.
 
-In the meanwhile, if you want to see what a custom integration of Twison might look like with another IF tool, check out [Tinsel](http://www.maketinsel.com), a tool that allows you to write telephone-based IF games. Although you can use Tinsel by writing game scripts in its own format, you can also create Tinsel games in Twine, by means of the [Tinsel-Twison](https://github.com/lazerwalker/tinsel-twison) project. 
+You can also unset variables in if passages links just like this:
+
+```
+%IFPASSAGE% [[%%!var1%%var1->passage_3]] [[var2->passage_5]] [[default->end_game]]
+```
+
+in this way if var1 is setted the passage_3 will follow and the var1 will be unsetted
 
 
 ## Development
 
-If you want to hack on Twison itself:
+If you want to modify or test Twivan:
 
 1. Clone this repo and run `npm install` to install dependencies.
 2. Make your changes to the unminified code in the `src` folder
@@ -101,9 +122,12 @@ Running `npm start` will start the `watch.js` auto-compile behavior, and also st
 This is easier to do with the browser-based version of Twine 2 than with the downloadable copy, as you can just refresh your output page and it'll use the latest version of Twison.
 
 
-All contributions are welcome! If making code changes, please be sure to run the test suite (`npm test`) before opening a pull request.
+All contributions are welcome! If making code changes, please be sure to run the test suite (`npm test`) before opening a pull request. -----TEST SUITE NEEDS TO BE REWORKED------
 
+## TODO:
+- Make some kind of check for presence of default link on if passages
+- Other correctiness check on used variables (Warnings)
 
 ## License
 
-Twison is licensed under the MIT license. See the LICENSE file for more information.
+Twivan is licensed under the MIT license. See the LICENSE file for more information.

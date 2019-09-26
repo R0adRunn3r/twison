@@ -8,7 +8,7 @@ var js = Uglify.minify("src/twison.js")
 html = html.replace("{{SCRIPT}}", js.code)
 
 var outputJSON = {
-  name: package.name,
+  name: "Twivan",
   version: package.version,
   author: package.author,
   description: package.description,
