@@ -1,5 +1,5 @@
 {
-  "name": "Twivan",
+  "name": "twivan",
   "version": "0.0.3",
   "description": "Export your Twine 2 story as a JSON document with new variable style",
   "main": "format.js",
